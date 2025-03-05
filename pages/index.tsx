@@ -1,5 +1,5 @@
 // pages/index.tsx
-import '../sytles/globals.css'
+import '../styles/globals.css'
 import { useState, useEffect } from 'react'
 import DiagnosticTestForm from '../components/DiagnosticTestForm'
 import DiagnosticTestList from '../components/DiagnosticTestList'
