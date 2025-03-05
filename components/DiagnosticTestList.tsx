@@ -1,4 +1,4 @@
-import { DiagnosticTest } from '@prisma/client'
+import {DiagnosticTest} from '../types'
 
 interface DiagnosticTestListProps {
   tests: DiagnosticTest[]

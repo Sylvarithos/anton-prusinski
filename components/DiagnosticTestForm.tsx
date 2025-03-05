@@ -1,28 +1,20 @@
 import { useState, FormEvent } from 'react'
+import {DiagnosticTest} from '../types'
 
-type DiagnosticTest = {
-  id?: number
-  patientName: string
-  testType: string
-  result: string
-  testDate: string
-  notes?: string
-}
-
-// Define the prop types for the component
 interface DiagnosticTestFormProps {
-  onSave: (test: DiagnosticTest) => void // The function to handle saving
-  existingTest?: DiagnosticTest | null // The existing test data, or null if adding a new test
+  onSave: (test: Omit<DiagnosticTest, 'id' | 'createdAt' | 'updatedAt'>) => void
+  existingTest: DiagnosticTest | null
 }
 
-const DiagnosticTestForm = ({ onSave, existingTest }: DiagnosticTestFormProps) => {
+
+const DiagnosticTestForm: React.FC<DiagnosticTestFormProps> = ({ onSave, existingTest }) => {
   const [patientName, setPatientName] = useState(existingTest?.patientName || '')
   const [testType, setTestType] = useState(existingTest?.testType || '')
   const [result, setResult] = useState(existingTest?.result || '')
   const [testDate, setTestDate] = useState(existingTest?.testDate || '')
   const [notes, setNotes] = useState(existingTest?.notes || '')
 
-  const handleSubmit = (e:FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     onSave({ patientName, testType, result, testDate, notes })
   }

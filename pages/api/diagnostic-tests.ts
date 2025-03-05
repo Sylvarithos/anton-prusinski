@@ -14,6 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const tests = await getAllDiagnosticTests()
         res.status(200).json(tests)
       } catch (error) {
+        console.log(error);
         res.status(500).json({ error: 'Failed to fetch diagnostic tests' })
       }
       break
@@ -25,6 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const newTest = await createDiagnosticTest({ patientName, testType, result, testDate: _testDate, notes })
         res.status(201).json(newTest)
       } catch (error) {
+        console.log(error);
         res.status(500).json({ error: 'Failed to create diagnostic test' })
       }
       break
@@ -36,6 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const updatedTest = await updateDiagnosticTest(id, { patientName: updatedPatientName, testType: updatedTestType, result: updatedResult, testDate: _testDate, notes: updatedNotes })
         res.status(200).json(updatedTest)
       } catch (error) {
+        console.log(error);
         res.status(500).json({ error: 'Failed to update diagnostic test' })
       }
       break
@@ -46,6 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await deleteDiagnosticTest(deleteId)
         res.status(204).end()
       } catch (error) {
+        console.log(error);
         res.status(500).json({ error: 'Failed to delete diagnostic test' })
       }
       break

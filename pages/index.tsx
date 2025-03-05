@@ -1,70 +1,95 @@
-// pages/index.tsx
-import '../styles/globals.css'
 import { useState, useEffect } from 'react'
 import DiagnosticTestForm from '../components/DiagnosticTestForm'
 import DiagnosticTestList from '../components/DiagnosticTestList'
+import { DiagnosticTest } from "../types"
 
 const HomePage = () => {
-  const [tests, setTests] = useState<any[]>([]) // Use `any[]` for flexibility, type this more specifically if needed
-  const [editingTest, setEditingTest] = useState<any | null>(null)
+  const [tests, setTests] = useState<DiagnosticTest[]>([]) 
+  const [editingTest, setEditingTest] = useState<DiagnosticTest | null>(null)
 
   // Fetch all diagnostic tests from the API
   useEffect(() => {
     const fetchTests = async () => {
-      const res = await fetch('/api/diagnostic-tests')
-      const data = await res.json()
-      setTests(data)
+      try {
+        const res = await fetch('/api/diagnostic-tests')
+        if (!res.ok) {
+          throw new Error('Failed to fetch diagnostic tests')
+        }
+        const data: DiagnosticTest[] = await res.json()
+
+        // Convert createdAt and updatedAt to Date objects
+        const convertedData = data.map(test => ({
+          ...test,
+          createdAt: new Date(test.createdAt),
+          updatedAt: new Date(test.updatedAt),
+        }))
+        
+        setTests(convertedData)
+      } catch (error) {
+        console.error('Error fetching tests:', error)
+      }
     }
 
     fetchTests()
   }, [])
 
   // Handle saving (creating or updating) a diagnostic test
-  const handleSaveTest = async (test: {
-    patientName: string
-    testType: string
-    result: string
-    testDate: string
-    notes?: string
-  }) => {
+  const handleSaveTest = async (test: Omit<DiagnosticTest, 'id' | 'createdAt' | 'updatedAt'>) => {
     const method = editingTest ? 'PUT' : 'POST'
     const url = '/api/diagnostic-tests'
-    const res = await fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id: editingTest?.id,
-        ...test,
-      }),
-    })
 
-    const newTest = await res.json()
-    setTests(prevTests => {
-      if (editingTest) {
-        return prevTests.map(t => (t.id === editingTest.id ? newTest : t))
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: editingTest?.id, // If editing, pass the id
+          ...test,
+        }),
+      })
+
+      if (!res.ok) {
+        throw new Error('Failed to save diagnostic test')
       }
-      return [...prevTests, newTest]
-    })
-    setEditingTest(null) // Reset the editing test
+
+      const newTest = await res.json()
+      setTests(prevTests => {
+        if (editingTest) {
+          return prevTests.map(t => (t.id === editingTest.id ? newTest : t))
+        }
+        return [...prevTests, newTest]
+      })
+      setEditingTest(null) // Reset the editing test
+    } catch (error) {
+      console.error('Error saving test:', error)
+    }
   }
 
   // Handle deleting a diagnostic test
   const handleDeleteTest = async (id: number) => {
-    await fetch('/api/diagnostic-tests', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ id }),
-    })
+    try {
+      const res = await fetch('/api/diagnostic-tests', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }),
+      })
 
-    setTests(tests.filter(test => test.id !== id)) // Remove the deleted test from the list
+      if (!res.ok) {
+        throw new Error('Failed to delete diagnostic test')
+      }
+
+      setTests(tests.filter(test => test.id !== id)) // Remove the deleted test from the list
+    } catch (error) {
+      console.error('Error deleting test:', error)
+    }
   }
 
   // Handle editing a diagnostic test
-  const handleEditTest = (test: any) => {
+  const handleEditTest = (test: DiagnosticTest) => {
     setEditingTest(test) // Set the test to edit
   }
 
