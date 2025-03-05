@@ -1,22 +1,31 @@
-import { useState, FormEvent } from 'react'
-import {DiagnosticTest} from '../types'
+import { useState, useEffect, FormEvent } from 'react'
+import { DiagnosticTest } from '../types'
 
 interface DiagnosticTestFormProps {
-  onSave: (test: Omit<DiagnosticTest, 'id' | 'createdAt' | 'updatedAt'>) => void
+  onSave: (test: Omit<DiagnosticTest, 'id'>) => void
   existingTest: DiagnosticTest | null
 }
 
-
 const DiagnosticTestForm: React.FC<DiagnosticTestFormProps> = ({ onSave, existingTest }) => {
-  const [patientName, setPatientName] = useState(existingTest?.patientName || '')
-  const [testType, setTestType] = useState(existingTest?.testType || '')
+  const [patient_name, setPatient_name] = useState(existingTest?.patient_name || '')
+  const [test_type, setTest_type] = useState(existingTest?.test_type || '')
   const [result, setResult] = useState(existingTest?.result || '')
-  const [testDate, setTestDate] = useState(existingTest?.testDate || '')
+  const [test_date, setTest_date] = useState(existingTest?.test_date || '')
   const [notes, setNotes] = useState(existingTest?.notes || '')
+
+  useEffect(() => {
+    if (existingTest) {
+      setPatient_name(existingTest.patient_name)
+      setTest_type(existingTest.test_type)
+      setResult(existingTest.result)
+      setTest_date(existingTest.test_date)
+      setNotes(existingTest.notes || '')
+    }
+  }, [existingTest])
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    onSave({ patientName, testType, result, testDate, notes })
+    onSave({ patient_name, test_type, result, test_date, notes })
   }
 
   return (
@@ -24,83 +33,61 @@ const DiagnosticTestForm: React.FC<DiagnosticTestFormProps> = ({ onSave, existin
       <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
         {existingTest ? 'Update Diagnostic Test' : 'Add New Diagnostic Test'}
       </h2>
-
       <form onSubmit={handleSubmit}>
-        {/* Patient Name */}
+        {/* Form inputs */}
         <div className="mb-4">
-          <label className="block text-gray-700 font-semibold mb-2" htmlFor="patientName">
-            Patient Name
-          </label>
+          <label className="block text-gray-700 font-semibold mb-2" htmlFor="patient_name">Patient Name</label>
           <input
             type="text"
-            id="patientName"
-            value={patientName}
-            onChange={(e) => setPatientName(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            id="patient_name"
+            value={patient_name}
+            onChange={(e) => setPatient_name(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-
-        {/* Test Type */}
         <div className="mb-4">
-          <label className="block text-gray-700 font-semibold mb-2" htmlFor="testType">
-            Test Type
-          </label>
+          <label className="block text-gray-700 font-semibold mb-2" htmlFor="test_type">Test Type</label>
           <input
             type="text"
-            id="testType"
-            value={testType}
-            onChange={(e) => setTestType(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            id="test_type"
+            value={test_type}
+            onChange={(e) => setTest_type(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-
-        {/* Result */}
         <div className="mb-4">
-          <label className="block text-gray-700 font-semibold mb-2" htmlFor="result">
-            Result
-          </label>
+          <label className="block text-gray-700 font-semibold mb-2" htmlFor="result">Result</label>
           <input
             type="text"
             id="result"
             value={result}
             onChange={(e) => setResult(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-
-        {/* Test Date */}
         <div className="mb-4">
-          <label className="block text-gray-700 font-semibold mb-2" htmlFor="testDate">
-            Test Date
-          </label>
+          <label className="block text-gray-700 font-semibold mb-2" htmlFor="test_date">Test Date</label>
           <input
             type="datetime-local"
-            id="testDate"
-            value={testDate}
-            onChange={(e) => setTestDate(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            id="test_date"
+            value={test_date ? new Date(test_date).toISOString().slice(0, 16) : ''}
+            onChange={(e) => setTest_date(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-
-        {/* Notes */}
-        <div className="mb-6">
-          <label className="block text-gray-700 font-semibold mb-2" htmlFor="notes">
-            Notes
-          </label>
+        <div className="mb-4">
+          <label className="block text-gray-700 font-semibold mb-2" htmlFor="notes">Notes</label>
           <textarea
             id="notes"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            rows={4}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-
-        {/* Submit Button */}
         <div className="flex justify-center">
           <button
             type="submit"
-            className="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            className="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {existingTest ? 'Update Test' : 'Add Test'}
           </button>

@@ -1,4 +1,4 @@
-import {DiagnosticTest} from '../types'
+import { DiagnosticTest } from '../types'
 
 interface DiagnosticTestListProps {
   tests: DiagnosticTest[]
@@ -13,15 +13,15 @@ const DiagnosticTestList: React.FC<DiagnosticTestListProps> = ({ tests, onDelete
       <ul className="space-y-6">
         {tests.map(test => (
           <li
-            key={test.id}
+            key={test.id} // Ensure each item has a unique key (use `test.id`)
             className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
           >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold text-gray-900">{test.patientName} - {test.testType}</h3>
+              <h3 className="text-xl font-semibold text-gray-900">{test.patient_name} - {test.test_type}</h3>
             </div>
             <div className="text-gray-700 mb-2">
               <p><strong className="font-semibold">Result:</strong> {test.result}</p>
-              <p><strong className="font-semibold">Test Date:</strong> {new Date(test.testDate).toLocaleString()}</p>
+              <p><strong className="font-semibold">Test Date:</strong> {new Date(test.test_date).toLocaleString()}</p>
               <p><strong className="font-semibold">Notes:</strong> {test.notes || 'No notes'}</p>
             </div>
 

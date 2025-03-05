@@ -1,43 +1,70 @@
 // models/diagnosticTest.ts
-import { PrismaClient, DiagnosticTest } from '@prisma/client'
+import supabase from '../lib/supabase'  // Import Supabase client
 
-const prisma = new PrismaClient()
+// Function to get all diagnostic tests
+export const getAllDiagnosticTests = async () => {
+  const { data, error } = await supabase
+    .from('diagnostic_tests') // Table name in Supabase
+    .select('*') // Get all columns
 
-// Function to fetch all diagnostic tests
-export const getAllDiagnosticTests = async (): Promise<DiagnosticTest[]> => {
-  return await prisma.diagnosticTest.findMany()
+  if (error) {
+    throw error  // Error handling, you could log this as needed
+  }
+
+  return data
 }
 
 // Function to create a new diagnostic test
-export const createDiagnosticTest = async (data: {
-  patientName: string
-  testType: string
-  result: string
-  testDate: Date
-  notes?: string
-}): Promise<DiagnosticTest> => {
-  return await prisma.diagnosticTest.create({
-    data
-  })
+export const createDiagnosticTest = async (test: { patient_name: string, test_type: string, result: string, test_date: Date, notes?: string }) => {
+  const { data, error } = await supabase
+    .from('diagnostic_tests')  // Table name
+    .insert([
+      {
+        patient_name: test.patient_name,
+        test_type: test.test_type,
+        result: test.result,
+        test_date: test.test_date,
+        notes: test.notes,
+      }
+    ])
+    .select()
+
+  if (error) {
+    throw error  // Error handling
+  }
+
+  return data[0]// Return the inserted record
 }
 
-// Function to update a diagnostic test
-export const updateDiagnosticTest = async (id: number, data: {
-  patientName?: string
-  testType?: string
-  result?: string
-  testDate?: Date
-  notes?: string
-}): Promise<DiagnosticTest> => {
-  return await prisma.diagnosticTest.update({
-    where: { id },
-    data
-  })
+// Function to update an existing diagnostic test
+export const updateDiagnosticTest = async (id: number, test: { patient_name: string, test_type: string, result: string, test_date: Date, notes?: string }) => {
+  const { data, error } = await supabase
+    .from('diagnostic_tests')  // Table name
+    .update({
+        patient_name: test.patient_name,
+        test_type: test.test_type,
+        result: test.result,
+        test_date: test.test_date,
+        notes: test.notes,
+    })
+    .eq('id', id)  // Match the test by ID
+    .select()
+
+  if (error) {
+    throw error  // Error handling
+  }
+
+  return data[0]// Return the updated test
 }
 
-// Function to delete a diagnostic test
-export const deleteDiagnosticTest = async (id: number): Promise<void> => {
-  await prisma.diagnosticTest.delete({
-    where: { id }
-  })
+// Function to delete a diagnostic test by ID
+export const deleteDiagnosticTest = async (id: number) => {
+  const { error } = await supabase
+    .from('diagnostic_tests')  // Table name
+    .delete()
+    .eq('id', id)  // Match the test by ID
+
+  if (error) {
+    throw error  // Error handling
+  }
 }

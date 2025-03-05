@@ -16,15 +16,7 @@ const HomePage = () => {
           throw new Error('Failed to fetch diagnostic tests')
         }
         const data: DiagnosticTest[] = await res.json()
-
-        // Convert createdAt and updatedAt to Date objects
-        const convertedData = data.map(test => ({
-          ...test,
-          createdAt: new Date(test.createdAt),
-          updatedAt: new Date(test.updatedAt),
-        }))
-        
-        setTests(convertedData)
+        setTests(data)
       } catch (error) {
         console.error('Error fetching tests:', error)
       }
@@ -34,7 +26,7 @@ const HomePage = () => {
   }, [])
 
   // Handle saving (creating or updating) a diagnostic test
-  const handleSaveTest = async (test: Omit<DiagnosticTest, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleSaveTest = async (test: Omit<DiagnosticTest, 'id'>) => {
     const method = editingTest ? 'PUT' : 'POST'
     const url = '/api/diagnostic-tests'
 
@@ -55,12 +47,14 @@ const HomePage = () => {
       }
 
       const newTest = await res.json()
+
       setTests(prevTests => {
         if (editingTest) {
           return prevTests.map(t => (t.id === editingTest.id ? newTest : t))
         }
         return [...prevTests, newTest]
       })
+
       setEditingTest(null) // Reset the editing test
     } catch (error) {
       console.error('Error saving test:', error)

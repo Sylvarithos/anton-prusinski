@@ -1,11 +1,10 @@
+
 // types.ts
 export interface DiagnosticTest {
     id: number;
-    patientName: string;
-    testType: string;
+    patient_name: string;
+    test_type: string;
     result: string;
-    testDate: string;
+    test_date: string;
     notes: string | null;
-    createdAt: Date;
-    updatedAt: Date;
 }
